@@ -39,7 +39,8 @@ const AdminProductsList = () => {
       <ul>
         {products.map((product) => (
           <li key={product._id}>
-            {product.name} - {product.price} - {product.category}
+            {product.name} - {product.price} - {product.category} -{" "}
+            {product.details}
             <button onClick={() => setSelectedProductId(product._id)}>
               Edit
             </button>

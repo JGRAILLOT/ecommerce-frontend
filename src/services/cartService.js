@@ -5,12 +5,12 @@ const getCartItems = async (userId) => {
   return await makeRequest("GET", `/cart/${userId}`);
 };
 
-const addToCart = async (userId, productId) => {
-  return await makeRequest("POST", `/cart`, { userId, productId });
+const addToCart = async (productId, userId, quantity) => {
+  return await makeRequest("POST", `/cart`, { productId, userId, quantity });
 };
 
-const removeFromCart = async (userId, productId) => {
-  return await makeRequest("DELETE", `/cart/${userId}/${productId}`);
+const removeFromCart = async (cartId) => {
+  return await makeRequest("DELETE", `/cart/${cartId}`);
 };
 
 const clearCart = async (userId) => {

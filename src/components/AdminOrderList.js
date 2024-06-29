@@ -8,8 +8,21 @@ const AdminOrderList = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const allOrders = await orderService.getAllOrders();
-      setOrders(allOrders);
+      try {
+        const allOrders = await orderService.getAllOrders();
+        if (Array.isArray(allOrders)) {
+          setOrders(allOrders);
+        } else {
+          setOrders([]); // Ensure orders is always an array.
+          console.error(
+            "Expected an array of orders, but received:",
+            allOrders
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        setOrders([]); // Fallback to an empty array in case of error.
+      }
     };
     fetchOrders();
   }, []);
@@ -19,9 +32,12 @@ const AdminOrderList = () => {
     setOrders(orders.filter((order) => order._id !== orderId));
   };
 
-  const filteredOrders = orders.filter((order) =>
-    order.address.toLowerCase().includes(filter.toLowerCase())
-  );
+  const filteredOrders =
+    filter.length > 0
+      ? orders.filter((order) =>
+          order.address.toLowerCase().includes(filter.toLowerCase())
+        )
+      : orders;
 
   return (
     <div>
@@ -38,11 +54,12 @@ const AdminOrderList = () => {
             <p>Address: {order.address}</p>
             <p>Items:</p>
             <ul>
-              {order.items.map((item) => (
-                <li key={item.productId}>
-                  {item.productName} - {item.productPrice}
-                </li>
-              ))}
+              {order.items &&
+                order.items.map((item) => (
+                  <li key={item.productId}>
+                    {item.productName} - {item.productPrice}
+                  </li>
+                ))}
             </ul>
             <button onClick={() => handleDelete(order._id)}>Delete</button>
           </li>

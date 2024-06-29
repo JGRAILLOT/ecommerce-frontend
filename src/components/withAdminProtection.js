@@ -1,29 +1,26 @@
-// src/components/withAdminProtection.js
-import React, { useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import userService from "../services/userService";
+import authService from "../services/authService";
 
 const withAdminProtection = (WrappedComponent) => {
   return (props) => {
-    const { user, isAuthenticated } = useContext(AuthContext);
+    const [isAdmin, setIsAdmin] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
       const verifyAdmin = async () => {
-        if (isAuthenticated) {
-          const userProfile = await userService.getUserProfile(user._id);
-          if (!userProfile.admin) {
-            navigate("/", { replace: true }); // Redirect to home if not an admin
-          }
+        const data = authService.getCurrentUser();
+        if (data.user && data.user.admin) {
+          setIsAdmin(true);
         } else {
-          navigate("/login", { replace: true }); // Redirect to login if not authenticated
+          navigate(data.user ? "/" : "/login", { replace: true });
         }
       };
       verifyAdmin();
-    }, [isAuthenticated, user, navigate]);
+    }, [navigate]);
 
-    return <WrappedComponent {...props} />;
+    // Render the component only if isAdmin is true
+    return isAdmin ? <WrappedComponent {...props} /> : null;
   };
 };
 

@@ -1,7 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
-import { AuthContext } from "../contexts/AuthContext";
 import styles from "../styles/LoginPage.module.css";
 
 const LoginPage = () => {
@@ -9,14 +8,11 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { setUser, setIsAdmin } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user = await authService.login(email, password);
-      setUser(user);
-      setIsAdmin(user.admin);
+      await authService.login(email, password);
       navigate("/", { replace: true });
     } catch (err) {
       setError("Invalid email or password");

@@ -1,4 +1,3 @@
-// src/components/ProductForm.js
 import React, { useState, useEffect } from "react";
 import productService from "../services/productService";
 
@@ -8,14 +7,20 @@ const ProductForm = ({ productId, onSave }) => {
     price: "",
     details: "",
     category: "",
-    picture: "",
   });
+  const [file, setFile] = useState(null); // New state for handling file input
 
   useEffect(() => {
     if (productId) {
       const fetchProduct = async () => {
         const fetchedProduct = await productService.getProduct(productId);
-        setProduct(fetchedProduct);
+        setProduct({
+          name: fetchedProduct.name,
+          price: fetchedProduct.price,
+          details: fetchedProduct.details,
+          category: fetchedProduct.category,
+        });
+        // Note: Image file handling is not required here
       };
       fetchProduct();
     }
@@ -25,12 +30,25 @@ const ProductForm = ({ productId, onSave }) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]); // Handle file input separately
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", product.name);
+    formData.append("price", product.price);
+    formData.append("details", product.details);
+    formData.append("category", product.category);
+    if (file) {
+      formData.append("image", file); // Only append file if it exists
+    }
+
     if (productId) {
-      await productService.updateProduct(productId, product);
+      await productService.updateProduct(productId, formData);
     } else {
-      await productService.createProduct(product);
+      await productService.createProduct(formData);
     }
     onSave();
   };
@@ -67,7 +85,7 @@ const ProductForm = ({ productId, onSave }) => {
       <div>
         <label>Category</label>
         <input
-          type="number"
+          type="text"
           name="category"
           value={product.category}
           onChange={handleChange}
@@ -75,12 +93,7 @@ const ProductForm = ({ productId, onSave }) => {
       </div>
       <div>
         <label>Picture</label>
-        <input
-          type="file"
-          name="picture"
-          value={product.picture}
-          onChange={handleChange}
-        />
+        <input type="file" name="image" onChange={handleFileChange} />
       </div>
       <button type="submit">Save</button>
     </form>

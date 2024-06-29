@@ -1,27 +1,15 @@
 // src/components/UserPage.js
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import userService from "../services/userService";
-import { AuthContext } from "../contexts/AuthContext";
+import authService from "../services/authService";
 
 const UserPage = () => {
-  const { user } = useContext(AuthContext);
+  const initialData = authService.getCurrentUser();
   const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    password: "",
+    username: initialData.user.username,
+    email: initialData.user.email,
+    password: "", // Manage password as part of state
   });
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const userProfile = await userService.getUserProfile(user._id);
-      setProfile({
-        name: userProfile.name,
-        email: userProfile.email,
-        password: "",
-      });
-    };
-    fetchUserProfile();
-  }, [user]);
 
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -29,7 +17,15 @@ const UserPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await userService.updateUserProfile(user._id, profile);
+    const updateData = {
+      username: profile.username,
+      email: profile.email,
+      ...(profile.password && { password: profile.password }), // Only add password to payload if it's not empty
+    };
+    await userService.updateUserProfile(initialData.user.id, updateData);
+
+    // Optionally reset the password field after successful update
+    setProfile((prev) => ({ ...prev, password: "" }));
   };
 
   return (
@@ -38,9 +34,10 @@ const UserPage = () => {
         <label>Name</label>
         <input
           type="text"
-          name="name"
-          value={profile.name}
+          name="username"
+          value={profile.username}
           onChange={handleChange}
+          required
         />
       </div>
       <div>
@@ -50,6 +47,7 @@ const UserPage = () => {
           name="email"
           value={profile.email}
           onChange={handleChange}
+          required
         />
       </div>
       <div>

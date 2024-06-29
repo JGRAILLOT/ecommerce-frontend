@@ -16,16 +16,13 @@ const login = async (email, password) => {
   }
 };
 
-const register = async (name, email, password) => {
+const register = async (username, email, password) => {
   try {
     const data = await makeRequest("POST", "/auth/register", {
-      name,
+      username,
       email,
       password,
     });
-    if (data.token) {
-      localStorage.setItem("user", JSON.stringify(data));
-    }
     return data;
   } catch (error) {
     throw error;
@@ -37,9 +34,9 @@ const logout = () => {
 };
 
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  const userData = localStorage.getItem("user");
+  return userData ? JSON.parse(userData) : null;
 };
-
 const authService = { login, register, logout, getCurrentUser };
 
 export default authService;

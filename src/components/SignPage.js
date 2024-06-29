@@ -4,7 +4,7 @@ import authService from "../services/authService";
 import styles from "../styles/SignPage.module.css";
 
 const SignPage = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,7 +13,7 @@ const SignPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await authService.register(name, email, password);
+      await authService.register(username, email, password);
       navigate("/login");
     } catch (err) {
       setError("Error signing up. Please try again.");
@@ -28,8 +28,8 @@ const SignPage = () => {
           <label>Name</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

@@ -1,11 +1,23 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../services/authService";
 import SearchBar from "./SearchBar";
 import styles from "../styles/Header.module.css";
 
 const Header = () => {
-  const { user, isAdmin, logout } = useContext(AuthContext);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const currentUser = authService.getCurrentUser();
+    setUser(currentUser?.user);
+  }, []);
+
+  const handleLogout = () => {
+    authService.logout();
+    setUser(null);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className={styles.header}>
@@ -16,17 +28,13 @@ const Header = () => {
         <SearchBar />
         {user && (
           <>
-            {!isAdmin && (
-              <>
-                <Link to="/orders" className={styles.navLink}>
-                  My Orders
-                </Link>
-                <Link to="/cart" className={styles.navLink}>
-                  My Cart
-                </Link>
-              </>
-            )}
-            {isAdmin && (
+            <Link to="/orders" className={styles.navLink}>
+              My Orders
+            </Link>
+            <Link to="/cart" className={styles.navLink}>
+              My Cart
+            </Link>
+            {user.admin && (
               <>
                 <Link to="/admin/products" className={styles.navLink}>
                   Admin Products
@@ -42,26 +50,21 @@ const Header = () => {
             <Link to="/user" className={styles.navLink}>
               Profile
             </Link>
+            <button className={styles.navLink} onClick={handleLogout}>
+              Logout
+            </button>
           </>
         )}
-        {
+        {!user && (
           <>
-            {user ? (
-              <button className={styles.navLink} onClick={logout}>
-                Logout
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className={styles.navLink}>
-                  Login
-                </Link>
-                <Link to="/signup" className={styles.navLink}>
-                  SignUp
-                </Link>
-              </>
-            )}
+            <Link to="/login" className={styles.navLink}>
+              Login
+            </Link>
+            <Link to="/signup" className={styles.navLink}>
+              SignUp
+            </Link>
           </>
-        }
+        )}
       </nav>
     </header>
   );

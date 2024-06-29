@@ -1,19 +1,19 @@
 // src/components/OrderList.js
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import orderService from "../services/orderService";
-import { AuthContext } from "../contexts/AuthContext";
+import authService from "../services/authService";
 
 const OrderList = () => {
-  const { user } = useContext(AuthContext);
+  const data = authService.getCurrentUser();
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const userOrders = await orderService.getUserOrders(user._id);
+      const userOrders = await orderService.getUserOrders(data.user.id);
       setOrders(userOrders);
     };
     fetchOrders();
-  }, [user]);
+  }, [data]);
 
   return (
     <div>

@@ -2,13 +2,14 @@
 import makeRequest from "../Api";
 
 const getUsers = async () => {
-  const response = await makeRequest("GET", `/users`);
-  return response.data;
+  const response = await makeRequest("GET", `/users/`);
+  return response;
 };
 
 const getUserProfile = async (userId) => {
   const response = await makeRequest("GET", `/users/profile/${userId}`);
-  return response.data;
+  console.log(response);
+  return response;
 };
 
 const updateUserProfile = async (userId, userData) => {
@@ -17,12 +18,12 @@ const updateUserProfile = async (userId, userData) => {
     `/users/profile/${userId}`,
     userData
   );
-  return response.data;
+  return response;
 };
 
 const deleteUser = async (userId) => {
   const response = await makeRequest("DELETE", `/users/${userId}`);
-  return response.data;
+  return response;
 };
 
 const userService = { getUsers, getUserProfile, updateUserProfile, deleteUser };

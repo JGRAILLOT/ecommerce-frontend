@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import productService from "../services/productService";
 import cartService from "../services/cartService";
-import AuthContext from "../contexts/AuthContext";
+import authService from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const ProductPage = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
+  const data = authService.getCurrentUser();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -18,6 +18,7 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       try {
         const productData = await productService.getProduct(id);
+        console.log(productData);
         setProduct(productData);
       } catch (err) {
         setError("Product not found");
@@ -30,13 +31,13 @@ const ProductPage = () => {
   }, [id]);
 
   const handleAddToCart = async () => {
-    if (!user) {
+    if (!data) {
       alert("Please log in to add products to the cart.");
       return;
     }
 
     try {
-      await cartService.addToCart(user.id, product.id, quantity);
+      await cartService.addToCart(product._id, data.user.id, quantity);
       alert("Product added to cart");
       navigate("/cart");
     } catch (error) {
@@ -52,7 +53,14 @@ const ProductPage = () => {
       {product && (
         <>
           <h1>{product.name}</h1>
-          <img src={`/${product.image}`} alt={product.name} />
+          {product.image && (
+            <p>
+              <img
+                src={"http://localhost:5000/" + product.image}
+                alt={product.name}
+              />
+            </p>
+          )}
           <p>{product.details}</p>
           <p>Price: ${product.price}</p>
           <label>
@@ -61,7 +69,8 @@ const ProductPage = () => {
               type="number"
               value={quantity}
               min="1"
-              onChange={(e) => setQuantity(e.target.value)}
+              max="99"
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
             />
           </label>
           <button onClick={handleAddToCart}>Add to Cart</button>

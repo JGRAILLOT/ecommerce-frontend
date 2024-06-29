@@ -10,12 +10,22 @@ const SearchBar = () => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (name) params.append("name", name);
-    if (category) params.append("category", category);
-    if (minPrice) params.append("minPrice", minPrice);
-    if (maxPrice) params.append("maxPrice", maxPrice);
 
-    navigate(`/search?${params.toString()}`, { replace: true });
+    // Append only non-empty and trimmed parameters
+    if (name.trim()) params.append("name", name.trim());
+    if (category.trim()) params.append("category", category.trim());
+    if (minPrice.trim()) params.append("minPrice", minPrice.trim());
+    if (maxPrice.trim()) params.append("maxPrice", maxPrice.trim());
+
+    // Construct the query string
+    const queryString = params.toString();
+
+    // Navigate to the search page with the query string, only if it's not empty
+    if (queryString) {
+      navigate(`/search?${queryString}`, { replace: true });
+    } else {
+      navigate("/search", { replace: true }); // or handle empty search differently
+    }
   };
 
   return (
@@ -27,7 +37,7 @@ const SearchBar = () => {
         onChange={(e) => setName(e.target.value)}
       />
       <input
-        type="number"
+        type="text"
         placeholder="Search by category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
