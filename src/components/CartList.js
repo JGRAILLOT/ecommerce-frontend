@@ -8,15 +8,16 @@ const CartList = () => {
   const [cart, setCart] = useState([]);
   const [address, setAddress] = useState("");
   const data = authService.getCurrentUser();
-  console.log(data);
 
   useEffect(() => {
     const fetchCart = async () => {
-      const cartItems = await cartService.getCart(data.user.id);
+      const cartItems = await cartService.getCartItems(data.user.id);
       setCart(cartItems);
     };
-    fetchCart();
-  }, [data.user]);
+    if (data.user.id) {
+      fetchCart();
+    }
+  }, [data.user.id]); // Only rerun when the user's ID changes
 
   const handleAddressChange = (e) => setAddress(e.target.value);
 
@@ -39,8 +40,8 @@ const CartList = () => {
       <h1>Your Cart</h1>
       {cart.map((item) => (
         <div key={item.productId}>
-          <h2>{item.productName}</h2>
-          <p>Price: ${item.price}</p>
+          <h2>{item.productId.name}</h2>
+          <p>Price: ${item.productId.price}</p>
           <p>Quantity: {item.quantity}</p>
         </div>
       ))}

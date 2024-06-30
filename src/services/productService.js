@@ -21,8 +21,8 @@ const deleteProduct = async (id) => {
   return await makeRequest("DELETE", `/products/${id}`);
 };
 
-const searchProducts = async (params) => {
-  return await makeRequest("GET", "/products/search", null, params);
+const searchProducts = async (data) => {
+  return await makeRequest("GET", "/products/search", data);
 };
 
 const getPopularProducts = async () => {
